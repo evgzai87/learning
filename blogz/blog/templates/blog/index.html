@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная страница</title>
+</head>
+<body>
+<a href="{% url 'blog:post_add' %}">Добавить пост</a>
+{% if posts_list %}
+{% for post in posts_list %}
+    <p>
+        <strong><a href="{% url 'blog:post_detail' post.id %}">{{ post.title }}</a></strong>
+        <span><a href="{% url 'blog:post_edit' post.id %}">Редактировать</a></span>
+    </p>
+{% endfor %}
+{% else %}
+    <p>No posts are published yet.</p>
+{% endif %}
+
+</body>
+</html>

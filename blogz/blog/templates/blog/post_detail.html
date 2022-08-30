@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post.title }}</title>
+</head>
+<body>
+<a href="{% url 'blog:index' %}">На главную</a>
+<p><strong>{{ post.title }}</strong></p>
+{{ post.content }}
+</body>
+</html>

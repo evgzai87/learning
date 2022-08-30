@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить пост</title>
+</head>
+<body>
+<h1>Добавить пост</h1>
+<a href="{% url 'blog:index' %}">На главную</a>
+<form action="{% url 'blog:post_add' %}" method="post">
+    {% csrf_token %}
+    {{ post_add_form.non_field_errors }}
+    {{ post_add_form.as_p }}
+    <input type="submit" value="Добавить">
+</form>
+</body>
+</html>
