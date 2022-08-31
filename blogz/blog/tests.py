@@ -14,6 +14,36 @@ def create_post(title, days_offset):
     publication_date = timezone.now() + datetime.timedelta(days=days_offset)
     return Post.objects.create(title=title, content=content, publication_date=publication_date)
 
+def create_user(username):
+    """
+    Creates a user with a given username.
+    """
+
+class ModelUserTests(TestCase):
+    """
+    . Create new user whose fields are all filled in.
+    . Create new user whose first_name is not filled in.
+    . Create new user whose last_name is not filled in.
+    . Create new user whose email is not filled in.
+    . Create new user whose registration_date is not filled in.
+
+    . Create two users with the same usernames.
+    . Create two users with the same first_name.
+    . Create two users with the same last_name.
+    . Create two users with the same email.
+    . Create two users with the same registration_date.
+
+    . Create user with registration_date in the future.
+    . Create user with registration_date in the past.
+    """
+    def test_create_new_user(self):
+        """
+        User is added to the DB.
+        :return:
+        """
+        pass
+
+
 
 class IndexViewTests(TestCase):
     def test_no_posts(self):
