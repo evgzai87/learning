@@ -30,13 +30,16 @@ def post_add(request):
 
 
 def post_edit(request, post_id):
-    edited_post = get_object_or_404(Post, id=post_id)
+    editing_post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
         post_edit_form = PostEditForm(request.POST)
         if post_edit_form.is_valid():
-            post_edit_form.save(edited_post)
+            # If a field is not changed don't rewrite it to the DB
+            editing_post.title = request.POST['title']
+            editing_post.content = request.POST['content']
+            editing_post.save()
             return HttpResponseRedirect(reverse('blog:index'))
     else:
-        post_edit_form = PostEditForm(instance=edited_post)
+        post_edit_form = PostEditForm(instance=editing_post)
     return render(request, 'blog/post_edit.html', {'post_edit_form': post_edit_form,
                                                    'post_id': post_id})
