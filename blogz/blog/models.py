@@ -3,10 +3,10 @@ from django.utils import timezone
 
 
 class User(models.Model):
-    username = models.CharField(verbose_name='Имя пользователя', max_length=20)
+    username = models.CharField(verbose_name='Имя пользователя', max_length=20, unique=True, blank=False)
     first_name = models.CharField(verbose_name='Имя', max_length=20)
     last_name = models.CharField(verbose_name='Фамилия', max_length=20)
-    email = models.EmailField(verbose_name='Email адрес')
+    email = models.EmailField(verbose_name='Email адрес', unique=True)
     registration_date = models.DateTimeField(verbose_name='Дата регистрации', default=timezone.now)
 
     def __str__(self):
