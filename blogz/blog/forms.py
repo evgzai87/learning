@@ -14,6 +14,10 @@ class PostAddForm(ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'content']
+        help_texts = {
+            'title': 'Укажите название статьи',
+            'content': 'Напишите что-нибудь по теме'
+        }
 
 
 class PostEditForm(ModelForm):
