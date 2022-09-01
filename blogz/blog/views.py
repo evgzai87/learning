@@ -1,8 +1,8 @@
 from django.shortcuts import render, reverse, get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from .models import Post
-from .forms import PostAddForm, PostEditForm
+from .models import Post, Category
+from .forms import PostAddForm, PostEditForm, CategoryAddEditForm, UserRegistrationForm
 
 
 def index(request):
@@ -16,6 +16,19 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     context = {'post': post}
     return render(request, 'blog/post_detail.html', context)
+
+
+def user_registration(request):
+    if request.method == 'POST':
+        user_registration_form = UserRegistrationForm(request.POST)
+        if user_registration_form.is_valid():
+            user_registration_form.save()
+            return HttpResponseRedirect(reverse('blog:index'))
+    else:
+        user_registration_form = UserRegistrationForm()
+    return render(request, 'blog/user_registration.html', {
+        'user_registration_form': user_registration_form
+    })
 
 
 def post_add(request):
@@ -43,3 +56,39 @@ def post_edit(request, post_id):
         post_edit_form = PostEditForm(instance=editing_post)
     return render(request, 'blog/post_edit.html', {'post_edit_form': post_edit_form,
                                                    'post_id': post_id})
+
+
+def categories(request):
+    categories_list = Category.objects.all().order_by('name')
+    print(f'---------CATEGORIES: {categories_list}')
+    context = {'categories_list': categories_list}
+    return render(request, 'blog/categories.html', context)
+
+
+def category_add(request):
+    if request.method == 'POST':
+        category_add_form = CategoryAddEditForm(request.POST)
+        if category_add_form.is_valid():
+            category_add_form.save()
+            return HttpResponseRedirect(reverse('blog:categories'))
+    else:
+        category_add_form = CategoryAddEditForm()
+    return render(request, 'blog/category_add.html', {
+        'category_add_form': category_add_form
+    })
+
+
+def category_edit(request, category_id):
+    editing_category = Category.objects.get(id=category_id)
+    if request.method == 'POST':
+        category_edit_form = CategoryAddEditForm(request.POST)
+        if category_edit_form.is_valid():
+            editing_category.name = request.POST['name']
+            editing_category.save()
+            return HttpResponseRedirect(reverse('blog:categories'))
+    else:
+        category_edit_form = CategoryAddEditForm(instance=editing_category)
+    return render(request, 'blog/category_edit.html', {
+        'category_edit_form': category_edit_form,
+        'category_id': category_id
+    })

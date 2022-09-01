@@ -1,16 +1,16 @@
-{% extends "blog/base.html" %}
+{% extends 'blog/base.html' %}
 
 {% block content %}
 
-<form action="{% url 'blog:post_edit' post_id %}" method="post">
+<form action="{% url 'blog:user_registration' %}" method="post">
     {% csrf_token %}
-    {{ post_edit_form.non_field_errors }}
+    {{ user_registration_form.non_field_errors }}
 
-    {% for field in post_edit_form %}
+    {% for field in user_registration_form %}
 
         <div class="mb-3">
-            {{ field.errors }}
             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field.errors }}
             {{ field }}
             {% if field.help_text %}
                 {{ field.help_text | escape }}
@@ -18,7 +18,7 @@
         </div>
 
     {% endfor %}
-    <input type="submit" class="btn btn-primary" value="Сохранить">
+    <input type="submit" class="btn btn-primary" value="Регистрация">
 </form>
 
 {% endblock content%}

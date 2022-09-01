@@ -1,0 +1,15 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+
+  {% if categories_list %}
+
+    {% for category in categories_list %}
+      <p><a href="{% url 'blog:category_edit' category.id %}">{{ category.name }}</a></p>
+    {% endfor %}
+
+  {% else %}
+    <p>No categories.</p>
+  {% endif %}
+<p><a href="{% url 'blog:category_add' %}">Добавить категорию</a></p>
+{% endblock content %}
