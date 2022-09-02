@@ -8,16 +8,20 @@ from .forms import PostAddForm, PostEditForm, CategoryAddEditForm, UserRegistrat
 def index(request):
     now = timezone.now()
     posts_list = Post.objects.filter(publication_date__lte=now).order_by('-publication_date')
-    context = {'posts_list': posts_list}
+    category_list = Category.objects.order_by('name')
+    context = {
+        'posts_list': posts_list,
+        'category_list': category_list
+    }
     return render(request, 'blog/index.html', context)
 
 
-def posts_by_category(request, category_name):
-    posts_list = Post.objects.filter(category=category_name
+def posts_by_category(request, category_id):
+    posts_list = Post.objects.filter(category=category_id
                                             ).order_by('-publication_date')
     context = {
         'posts_list': posts_list,
-        'category_name': category_name
+        'category_name': category_id
     }
     return render(request, 'blog/index.html', context)
 
