@@ -12,6 +12,16 @@ def index(request):
     return render(request, 'blog/index.html', context)
 
 
+def posts_by_category(request, category_name):
+    posts_list = Post.objects.filter(category=category_name
+                                            ).order_by('-publication_date')
+    context = {
+        'posts_list': posts_list,
+        'category_name': category_name
+    }
+    return render(request, 'blog/index.html', context)
+
+
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     context = {'post': post}
