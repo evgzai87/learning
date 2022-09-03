@@ -1,0 +1,26 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 offset-md-4">
+        <form action="{% url 'blog:user_authentication' %}" method="post">
+            {% csrf_token %}
+            {{ user_authentication_form.non_field_errors }}
+
+            {% for field in user_authentication_form %}
+
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field.errors }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        {{ field.help_text | escape }}
+                    {% endif %}
+                </div>
+
+            {% endfor %}
+            <input type="submit" class="btn btn-primary" value="Войти">
+        </form>
+    </div>
+</div>
+{% endblock content%}

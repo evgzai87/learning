@@ -1,8 +1,14 @@
 from django.shortcuts import render, reverse, get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from .models import Post
-from .forms import PostAddForm, PostEditForm, UserRegistrationForm
+from .models import\
+    Post, \
+    User
+from .forms import \
+    PostAddForm,\
+    PostEditForm,\
+    UserRegistrationForm,\
+    UserAuthenticationForm
 
 
 def index(request):
@@ -69,3 +75,28 @@ def user_registration(request):
     return render(request, 'blog/user_registration.html', {
         'user_registration_form': user_registration_form
     })
+
+
+def user_authentication(request):
+    if request.method == 'POST':
+        user_authentication_form = UserAuthenticationForm(request.POST)
+        if user_authentication_form.is_valid():
+            if User.objects.filter(
+                    username=user_authentication_form.cleaned_data['username']
+            ):
+                username = user_authentication_form.cleaned_data['username']
+                return HttpResponseRedirect(
+                    reverse('blog:user_profile', args=[username])
+                )
+    else:
+        user_authentication_form = UserAuthenticationForm()
+    return render(
+        request,
+        'blog/user_authentication.html',
+        {'user_authentication_form': user_authentication_form}
+    )
+
+
+def user_profile(request, username):
+
+    return render(request, 'blog/user_profile.html', {'username': username})
