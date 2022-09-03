@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 
 class User(models.Model):
@@ -15,22 +16,31 @@ class User(models.Model):
         verbose_name='Дата регистрации',
         default=timezone.now)
 
+    class Meta:
+        ordering = ['username']
+
     def __str__(self):
         return self.username
 
 
-class Category(models.Model):
-    name = models.CharField(
-        verbose_name='Название категории',
-        max_length=50,
-        unique=True
-    )
+class Article(models.Model):
+    CATEGORIES = [
+        'Россия',
+        'Мир',
+        'Бывший СССР',
+        'Экономика',
+        'Силовые структуры',
+        'Наука и техника',
+        'Культура',
+        'Спорт',
+        'Интернет и СМИ',
+        'Ценности',
+        'Путешествия',
+        'Из жизни',
+        'Среда обитания',
+        'Забота о себе'
+    ]
 
-    def __str__(self):
-        return self.name
-
-
-class Post(models.Model):
     title = models.CharField(verbose_name='Название статьи', max_length=100)
     content = models.TextField(verbose_name='Содержание статьи')
     publication_date = models.DateTimeField(
@@ -39,6 +49,15 @@ class Post(models.Model):
     )
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
     category = models.ManyToManyField(Category)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ['-publication_date']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return super().save(self, *args, **kwargs)
 
     def __str__(self):
         return self.title

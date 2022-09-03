@@ -1,14 +1,14 @@
 from django.shortcuts import render, reverse, get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from .models import Post, Category
+from .models import Article, Category
 from .forms import PostAddForm, PostEditForm, CategoryAddEditForm, UserRegistrationForm
 
 
 def index(request):
     now = timezone.now()
-    posts_list = Post.objects.filter(publication_date__lte=now).order_by('-publication_date')
-    category_list = Category.objects.order_by('name')
+    posts_list = Article.objects.filter(publication_date__lte=now)
+    category_list = Category.objects.all()
     context = {
         'posts_list': posts_list,
         'category_list': category_list
@@ -17,18 +17,23 @@ def index(request):
 
 
 def posts_by_category(request, category_id):
-    posts_list = Post.objects.filter(category=category_id
-                                            ).order_by('-publication_date')
+    posts_list = Article.objects.filter(category_1=category_id)
+    category_list = Category.objects.all()
     context = {
         'posts_list': posts_list,
-        'category_name': category_id
+        'category_name': category_id,
+        'category_list': category_list
     }
     return render(request, 'blog/index.html', context)
 
 
-def post_detail(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    context = {'post': post}
+def post_detail(request, post_slug):
+    post = get_object_or_404(Article, slug=post_slug)
+    category_list = Category.objects.all()
+    context = {
+        'post': post,
+        'category_list': category_list
+    }
     return render(request, 'blog/post_detail.html', context)
 
 
@@ -57,7 +62,7 @@ def post_add(request):
 
 
 def post_edit(request, post_id):
-    editing_post = get_object_or_404(Post, id=post_id)
+    editing_post = get_object_or_404(Article, id=post_id)
     if request.method == 'POST':
         post_edit_form = PostEditForm(request.POST)
         if post_edit_form.is_valid():

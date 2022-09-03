@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 import datetime
-from .models import Post, User
+from .models import Article, User
 
 
 def create_post(
@@ -19,7 +19,7 @@ def create_post(
     content = "Test post content."
     publication_date = timezone.now() + datetime.timedelta(days=days_offset)
     owner = User.objects.create(username=author, email=email)
-    return Post.objects.create(
+    return Article.objects.create(
         title=title,
         content=content,
         publication_date=publication_date,
