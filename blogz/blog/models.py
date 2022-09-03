@@ -9,12 +9,24 @@ class User(models.Model):
         max_length=20,
         unique=True
     )
-    first_name = models.CharField(verbose_name='Имя', max_length=20)  # not required
-    last_name = models.CharField(verbose_name='Фамилия', max_length=20)  # not required
-    email = models.EmailField(verbose_name='Email адрес', unique=True)
+    first_name = models.CharField(
+        verbose_name='Имя',
+        max_length=20,
+        blank=True
+    )  # not required
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        max_length=20,
+        blank=True
+    )  # not required
+    email = models.EmailField(
+        verbose_name='Email адрес',
+        unique=True
+    )
     registration_date = models.DateTimeField(
         verbose_name='Дата регистрации',
-        default=timezone.now)
+        default=timezone.now
+    )
 
     class Meta:
         ordering = ['username']
