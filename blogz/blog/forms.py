@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Article, Category, User
+from .models import Post, User
 
 
 class UserRegistrationForm(ModelForm):
@@ -34,8 +34,8 @@ class PostAddForm(ModelForm):
         )
 
     class Meta:
-        model = Article
-        fields = ['title', 'content', 'category_1', 'category_2', 'owner']
+        model = Post
+        fields = ['title', 'content', 'category', 'owner']
         help_texts = {
             'title': 'Укажите название статьи',
             'content': 'Напишите что-нибудь по теме'
@@ -52,17 +52,5 @@ class PostEditForm(ModelForm):
             {'class': 'form-control'}
         )
     class Meta:
-        model = Article
-        fields = ['title', 'content', 'category_1', 'owner']
-
-
-class CategoryAddEditForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs.update(
-            {'class': 'form-control'}
-        )
-
-    class Meta:
-        model = Category
-        fields = ['name']
+        model = Post
+        fields = ['title', 'content', 'category', 'owner']

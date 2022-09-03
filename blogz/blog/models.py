@@ -23,23 +23,21 @@ class User(models.Model):
         return self.username
 
 
-class Article(models.Model):
-    CATEGORIES = [
-        'Россия',
-        'Мир',
-        'Бывший СССР',
-        'Экономика',
-        'Силовые структуры',
-        'Наука и техника',
-        'Культура',
-        'Спорт',
-        'Интернет и СМИ',
-        'Ценности',
-        'Путешествия',
-        'Из жизни',
-        'Среда обитания',
-        'Забота о себе'
-    ]
+class Post(models.Model):
+    CATEGORY_CHOICES = (
+        ('1', 'Россия'),
+        ('2', 'Мир'),
+        ('3', 'Бывший СССР'),
+        ('4', 'Экономика'),
+        ('5', 'Силовые структуры'),
+        ('6', 'Наука и техника'),
+        ('7', 'Культура'),
+        ('8', 'Спорт'),
+        ('9', 'Интернет и СМИ'),
+        ('10', 'Ценности'),
+        ('11', 'Путешествия'),
+        ('12', 'Из жизни')
+    )
 
     title = models.CharField(verbose_name='Название статьи', max_length=100)
     content = models.TextField(verbose_name='Содержание статьи')
@@ -48,7 +46,11 @@ class Article(models.Model):
         default=timezone.now
     )
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
-    category = models.ManyToManyField(Category)
+    category = models.CharField(
+        max_length=2,
+        choices=CATEGORY_CHOICES,
+        default='1'
+    )
     slug = models.SlugField(unique=True)
 
     class Meta:

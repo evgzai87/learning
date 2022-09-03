@@ -1,11 +1,16 @@
 <div class="nav-scroller py-1 mb-2">
   <nav class="nav d-flex justify-content-between">
-    {% if category_list %}
-      {% for category in category_list %}
-        <a href="{% url 'blog:posts_by_category' category.id %}" class="p-2 link-secondary">{{ category.name }}</a>
-      {% endfor %}
-    {% endif%}
-    <a class="p-2 link-secondary" href="{% url 'blog:post_add' %}">Add post</a>
-    <a class="p-2 link-secondary" href="{% url 'blog:category_add' %}">Add category</a>
+    <a class="p-2 link-secondary" href="#">Россия</a>
+    <a class="p-2 link-secondary" href="#">Мир</a>
+    <a class="p-2 link-secondary" href="#">Бывший СССР</a>
+    <a class="p-2 link-secondary" href="#">Экономика</a>
+    <a class="p-2 link-secondary" href="#">Силовые структуры</a>
+    <a class="p-2 link-secondary" href="#">Наука и техника</a>
+    <a class="p-2 link-secondary" href="#">Культура</a>
+    <a class="p-2 link-secondary" href="#">Спорт</a>
+    <a class="p-2 link-secondary" href="#">Интернет и СМИ</a>
+    <a class="p-2 link-secondary" href="#">Ценности</a>
+    <a class="p-2 link-secondary" href="#">Путешествия</a>
+    <a class="p-2 link-secondary" href="#">Из жизни</a>
   </nav>
 </div>
