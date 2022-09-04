@@ -37,6 +37,7 @@ class User(models.Model):
 
 class Post(models.Model):
     CATEGORY_CHOICES = (
+        (None, 'Выберите категорию'),
         ('1', 'Россия'),
         ('2', 'Мир'),
         ('3', 'Бывший СССР'),
@@ -60,8 +61,7 @@ class Post(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
     category = models.CharField(
         max_length=2,
-        choices=CATEGORY_CHOICES,
-        default='1'
+        choices=CATEGORY_CHOICES
     )
     slug = models.SlugField(unique=True)
 

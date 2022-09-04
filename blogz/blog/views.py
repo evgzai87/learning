@@ -17,16 +17,23 @@ def index(request):
     context = {
         'posts_list': posts_list
     }
-    return render(request, 'blog/index.html', context)
+    return render(
+        request,
+        'blog/index.html',
+        context)
 
 
-def posts_by_category(request, category_id):
-    posts_list = Post.objects.filter(category=category_id)
+def posts_by_category(request, category):
+    posts_list = Post.objects.filter(category=category)
     context = {
         'posts_list': posts_list,
-        'category_name': category_id
+        'category_name': category
     }
-    return render(request, 'blog/index.html', context)
+    return render(
+        request,
+        'blog/index.html',
+        context
+    )
 
 
 def post_detail(request, post_slug):
@@ -34,7 +41,11 @@ def post_detail(request, post_slug):
     context = {
         'post': post
     }
-    return render(request, 'blog/post_detail.html', context)
+    return render(
+        request,
+        'blog/post_detail.html',
+        context
+    )
 
 
 def post_add(request):
@@ -45,7 +56,11 @@ def post_add(request):
             return HttpResponseRedirect(reverse('blog:index'))
     else:
         post_add_form = PostAddForm()
-    return render(request, 'blog/post_add.html', {'post_add_form': post_add_form})
+    return render(
+        request,
+        'blog/post_add.html',
+        {'post_add_form': post_add_form}
+    )
 
 
 def post_edit(request, post_id):
@@ -60,8 +75,14 @@ def post_edit(request, post_id):
             return HttpResponseRedirect(reverse('blog:index'))
     else:
         post_edit_form = PostEditForm(instance=editing_post)
-    return render(request, 'blog/post_edit.html', {'post_edit_form': post_edit_form,
-                                                   'post_id': post_id})
+    return render(
+        request,
+        'blog/post_edit.html',
+        {
+            'post_edit_form': post_edit_form,
+            'post_id': post_id
+        }
+    )
 
 
 def user_registration(request):
@@ -72,9 +93,11 @@ def user_registration(request):
             return HttpResponseRedirect(reverse('blog:index'))
     else:
         user_registration_form = UserRegistrationForm()
-    return render(request, 'blog/user_registration.html', {
-        'user_registration_form': user_registration_form
-    })
+    return render(
+        request,
+        'blog/user_registration.html',
+        {'user_registration_form': user_registration_form}
+    )
 
 
 def user_authentication(request):
@@ -99,4 +122,8 @@ def user_authentication(request):
 
 def user_profile(request, username):
 
-    return render(request, 'blog/user_profile.html', {'username': username})
+    return render(
+        request,
+        'blog/user_profile.html',
+        {'username': username}
+    )

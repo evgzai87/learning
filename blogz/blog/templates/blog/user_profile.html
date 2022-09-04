@@ -4,8 +4,11 @@
 <div class="row g-5">
     <div class="col-md-8">
 
-        <h1>Hello, {{ username }}!</h1>
+        <h2>Hello, {{ username }}!</h2>
+        <ul>
+            <li><a href="{% url 'blog:post_add' %}">Добавить пост</a></li>
 
+        </ul>
     </div>
 </div>
 
