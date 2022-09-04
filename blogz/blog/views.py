@@ -1,9 +1,20 @@
-from django.shortcuts import render, reverse, get_object_or_404, get_list_or_404
-from django.http import HttpResponseRedirect
 from django.utils import timezone
+from django.db.models import F
+
+from django.http import \
+    HttpResponseRedirect,\
+    Http404
+
 from .models import\
     Post, \
     User
+
+from django.shortcuts import \
+    render, \
+    reverse, \
+    get_object_or_404, \
+    get_list_or_404
+
 from .forms import \
     PostAddForm,\
     PostEditForm,\
@@ -52,8 +63,9 @@ def post_add(request):
     if request.method == 'POST':
         post_add_form = PostAddForm(request.POST)
         if post_add_form.is_valid():
+            user = post_add_form.cleaned_data['owner']
             post_add_form.save()
-            return HttpResponseRedirect(reverse('blog:index'))
+            return HttpResponseRedirect(reverse('blog:user_profile', args=[user]))
     else:
         post_add_form = PostAddForm()
     return render(
@@ -64,17 +76,28 @@ def post_add(request):
 
 
 def post_edit(request, post_id):
-    editing_post = get_object_or_404(Post, id=post_id)
+    editing_post = Post.objects.filter(pk=post_id)
+    user = editing_post[0].owner
     if request.method == 'POST':
-        post_edit_form = PostEditForm(request.POST)
+        post_edit_form = PostEditForm(
+            request.POST,
+            instance=editing_post[0]
+        )
         if post_edit_form.is_valid():
-            # If a field is not changed don't rewrite it to the DB
-            editing_post.title = request.POST['title']
-            editing_post.content = request.POST['content']
-            editing_post.save()
-            return HttpResponseRedirect(reverse('blog:index'))
+            new_title = post_edit_form.cleaned_data['title']
+            new_content = post_edit_form.cleaned_data['content']
+            new_category = post_edit_form.cleaned_data['category']
+            print(f'NEW_TITLE-----------: {new_title}')
+            print(f'NEW_CONTENT-----------: {new_content}')
+            print(f'NEW_CATEGORY-----------: {new_category}')
+            editing_post.update(title=new_title)
+            editing_post.update(content=new_content)
+            editing_post.update(category=new_category)
+
+            return HttpResponseRedirect(reverse('blog:user_profile', args=[user]))
     else:
-        post_edit_form = PostEditForm(instance=editing_post)
+        post_edit_form = PostEditForm(instance=editing_post[0])
+
     return render(
         request,
         'blog/post_edit.html',
@@ -83,6 +106,13 @@ def post_edit(request, post_id):
             'post_id': post_id
         }
     )
+
+
+def post_remove(request, post_id):
+    owner = get_object_or_404(Post, id=post_id).owner
+    post = Post.objects.get(id=post_id)
+    post.delete()
+    return HttpResponseRedirect(reverse('blog:user_profile', args=[owner]))
 
 
 def user_registration(request):
@@ -121,9 +151,12 @@ def user_authentication(request):
 
 
 def user_profile(request, username):
-
+    user_posts = User.objects.get(username=username).post_set.all()
     return render(
         request,
         'blog/user_profile.html',
-        {'username': username}
+        {
+            'username': username,
+            'user_posts': user_posts
+        }
     )

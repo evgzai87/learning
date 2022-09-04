@@ -7,8 +7,20 @@
         <h2>Hello, {{ username }}!</h2>
         <ul>
             <li><a href="{% url 'blog:post_add' %}">Добавить пост</a></li>
-
         </ul>
+        <!-- list of posts -->
+        <h3>Ваши посты</h3>
+
+        <ul>
+            {% for post in user_posts %}
+            <li>
+                {{ post.title }}
+                <a href="{% url 'blog:post_edit' post.id %}">Редактировать</a>
+                <a href="{% url 'blog:post_remove' post.id %}">Удалить</a>
+            </li>
+            {% endfor %}
+        </ul>
+
     </div>
 </div>
 

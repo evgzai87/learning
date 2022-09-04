@@ -19,7 +19,7 @@
             </article>
             <p class="blog-post-meta">{{ post.publication_date }} by <a href="#">{{ post.owner }}</a></p>
             <p>{{ post.content | truncatewords:60 }}</p>
-                <a href="{% url 'blog:post_detail' post.id %}">Читать далее</a>
+                <a href="{% url 'blog:post_detail' post.slug %}">Читать далее</a>
             <hr>
         {% endfor %}
         {% else %}

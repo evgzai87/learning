@@ -76,4 +76,4 @@ class PostEditForm(ModelForm):
         )
     class Meta:
         model = Post
-        fields = ['title', 'content', 'category', 'owner']
+        fields = ['title', 'content', 'category']
