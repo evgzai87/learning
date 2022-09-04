@@ -8,10 +8,14 @@
         {% for post in posts_list %}
             <article class="blog-post">
                 <h2 class="blog-post-title mb-1">{{ post.title }}</h2>
-            </article>
-            <p class="blog-post-meta">{{ post.publication_date }} by <a href="#">{{ post.owner }}</a></p>
+
+            <p class="blog-post-meta">
+                {{ post.publication_date }} by <a href="#">{{ post.owner }}</a>
+                {{ post.category }}
+            </p>
             <p>{{ post.content | truncatewords:60 }}</p>
                 <a href="{% url 'blog:post_detail' post.id %}">Читать далее</a>
+            </article>
             <hr>
         {% endfor %}
         {% else %}

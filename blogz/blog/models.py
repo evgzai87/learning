@@ -36,20 +36,33 @@ class User(models.Model):
 
 
 class Post(models.Model):
-    CATEGORY_CHOICES = (
+    RUSSIA = '1'
+    WORLD = '2'
+    EX_USSR = '3'
+    ECONOMY = '4'
+    FORCE_STRUCTURES = '5'
+    SCIENCE_AND_TECHNOLOGY = '6'
+    CULTURE = '7'
+    SPORT = '8'
+    INTERNET_AND_MASS_MEDIA = '9'
+    VALUES = '10'
+    TRAVELS = '11'
+    FROM_THE_LIFE = '12'
+
+    CATEGORY = (
         (None, 'Выберите категорию'),
-        ('1', 'Россия'),
-        ('2', 'Мир'),
-        ('3', 'Бывший СССР'),
-        ('4', 'Экономика'),
-        ('5', 'Силовые структуры'),
-        ('6', 'Наука и техника'),
-        ('7', 'Культура'),
-        ('8', 'Спорт'),
-        ('9', 'Интернет и СМИ'),
-        ('10', 'Ценности'),
-        ('11', 'Путешествия'),
-        ('12', 'Из жизни')
+        (RUSSIA, 'Россия'),
+        (WORLD, 'Мир'),
+        (EX_USSR, 'Бывший СССР'),
+        (ECONOMY, 'Экономика'),
+        (FORCE_STRUCTURES, 'Силовые структуры'),
+        (SCIENCE_AND_TECHNOLOGY, 'Наука и техника'),
+        (CULTURE, 'Культура'),
+        (SPORT, 'Спорт'),
+        (INTERNET_AND_MASS_MEDIA, 'Интернет и СМИ'),
+        (VALUES, 'Ценности'),
+        (TRAVELS, 'Путешествия'),
+        (FROM_THE_LIFE, 'Из жизни')
     )
 
     title = models.CharField(verbose_name='Название статьи', max_length=100)
@@ -61,7 +74,7 @@ class Post(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
     category = models.CharField(
         max_length=2,
-        choices=CATEGORY_CHOICES
+        choices=CATEGORY
     )
     slug = models.SlugField(unique=True)
 
@@ -70,7 +83,7 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title, allow_unicode=True)
         return super().save(self, *args, **kwargs)
 
     def __str__(self):
