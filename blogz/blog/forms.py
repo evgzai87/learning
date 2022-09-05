@@ -55,10 +55,13 @@ class PostAddForm(ModelForm):
         self.fields['content'].widget.attrs.update(
             {'class': 'form-control'}
         )
+        self.fields['image'].widget.attrs.update(
+            {'class': 'form-control'}
+        )
 
     class Meta:
         model = Post
-        fields = ['title', 'content', 'category', 'owner']
+        fields = ['title', 'content', 'image', 'category', 'owner']
         help_texts = {
             'title': 'Укажите название статьи',
             'content': 'Напишите что-нибудь по теме'
@@ -74,6 +77,10 @@ class PostEditForm(ModelForm):
         self.fields['content'].widget.attrs.update(
             {'class': 'form-control'}
         )
+        self.fields['image'].widget.attrs.update(
+            {'class': 'form-control'}
+        )
+
     class Meta:
         model = Post
-        fields = ['title', 'content', 'category']
+        fields = ['title', 'content', 'image', 'category']

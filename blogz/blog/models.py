@@ -67,6 +67,11 @@ class Post(models.Model):
 
     title = models.CharField(verbose_name='Название статьи', max_length=100)
     content = models.TextField(verbose_name='Содержание статьи')
+    image = models.ImageField(
+        verbose_name='Фото',
+        upload_to='%Y/%m/%d/',
+        blank=True
+    )
     publication_date = models.DateTimeField(
         verbose_name='Дата публикации',
         default=timezone.now

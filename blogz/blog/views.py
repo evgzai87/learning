@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django.db.models import F
+
 
 from django.http import \
     HttpResponseRedirect,\
@@ -47,8 +47,8 @@ def posts_by_category(request, category):
     )
 
 
-def post_detail(request, post_slug):
-    post = get_object_or_404(Post, slug=post_slug)
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
     context = {
         'post': post
     }
@@ -61,7 +61,7 @@ def post_detail(request, post_slug):
 
 def post_add(request):
     if request.method == 'POST':
-        post_add_form = PostAddForm(request.POST)
+        post_add_form = PostAddForm(request.POST, request.FILES)
         if post_add_form.is_valid():
             user = post_add_form.cleaned_data['owner']
             post_add_form.save()
@@ -81,15 +81,14 @@ def post_edit(request, post_id):
     if request.method == 'POST':
         post_edit_form = PostEditForm(
             request.POST,
+            request.FILES,
             instance=editing_post[0]
         )
+
         if post_edit_form.is_valid():
             new_title = post_edit_form.cleaned_data['title']
             new_content = post_edit_form.cleaned_data['content']
             new_category = post_edit_form.cleaned_data['category']
-            print(f'NEW_TITLE-----------: {new_title}')
-            print(f'NEW_CONTENT-----------: {new_content}')
-            print(f'NEW_CATEGORY-----------: {new_category}')
             editing_post.update(title=new_title)
             editing_post.update(content=new_content)
             editing_post.update(category=new_category)

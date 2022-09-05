@@ -6,6 +6,9 @@
 
         <article class="blog-post">
             <h2 class="blog-post-title mb-1">{{ post.title }}</h2>
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="">
+            {% endif %}
             <p>{{ post.content }}</p>
         </article>
 
