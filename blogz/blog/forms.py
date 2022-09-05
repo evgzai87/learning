@@ -25,7 +25,7 @@ class UserRegistrationForm(ModelForm):
         fields = ['username', 'first_name', 'last_name', 'email']
 
 
-class UserAuthenticationForm(Form):
+class UserLoginForm(Form):
     username = forms.CharField(
         label='Имя пользователя',
         max_length=20

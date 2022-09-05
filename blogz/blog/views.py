@@ -1,11 +1,15 @@
 from django.utils import timezone
-
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import \
+    authenticate, \
+    login, \
+    logout
 
 from django.http import \
-    HttpResponseRedirect,\
+    HttpResponseRedirect, \
     Http404
 
-from .models import\
+from .models import \
     Post, \
     User
 
@@ -16,10 +20,10 @@ from django.shortcuts import \
     get_list_or_404
 
 from .forms import \
-    PostAddForm,\
-    PostEditForm,\
-    UserRegistrationForm,\
-    UserAuthenticationForm
+    PostAddForm, \
+    PostEditForm, \
+    UserRegistrationForm, \
+    UserLoginForm
 
 
 def index(request):
@@ -59,7 +63,10 @@ def post_detail(request, post_id):
     )
 
 
+# @login_required()
 def post_add(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('blog:user_login'))
     if request.method == 'POST':
         post_add_form = PostAddForm(request.POST, request.FILES)
         if post_add_form.is_valid():
@@ -76,42 +83,48 @@ def post_add(request):
 
 
 def post_edit(request, post_id):
-    editing_post = Post.objects.filter(pk=post_id)
-    user = editing_post[0].owner
-    if request.method == 'POST':
-        post_edit_form = PostEditForm(
-            request.POST,
-            request.FILES,
-            instance=editing_post[0]
-        )
-
-        if post_edit_form.is_valid():
-            new_title = post_edit_form.cleaned_data['title']
-            new_content = post_edit_form.cleaned_data['content']
-            new_category = post_edit_form.cleaned_data['category']
-            editing_post.update(title=new_title)
-            editing_post.update(content=new_content)
-            editing_post.update(category=new_category)
-
-            return HttpResponseRedirect(reverse('blog:user_profile', args=[user]))
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('blog:user_login'))
     else:
-        post_edit_form = PostEditForm(instance=editing_post[0])
+        editing_post = Post.objects.filter(pk=post_id)
+        user = editing_post[0].owner
+        if request.method == 'POST':
+            post_edit_form = PostEditForm(
+                request.POST,
+                request.FILES,
+                instance=editing_post[0]
+            )
 
-    return render(
-        request,
-        'blog/post_edit.html',
-        {
-            'post_edit_form': post_edit_form,
-            'post_id': post_id
-        }
-    )
+            if post_edit_form.is_valid():
+                new_title = post_edit_form.cleaned_data['title']
+                new_content = post_edit_form.cleaned_data['content']
+                new_category = post_edit_form.cleaned_data['category']
+                editing_post.update(title=new_title)
+                editing_post.update(content=new_content)
+                editing_post.update(category=new_category)
+
+                return HttpResponseRedirect(reverse('blog:user_profile', args=[user]))
+        else:
+            post_edit_form = PostEditForm(instance=editing_post[0])
+
+        return render(
+            request,
+            'blog/post_edit.html',
+            {
+                'post_edit_form': post_edit_form,
+                'post_id': post_id
+            }
+        )
 
 
 def post_remove(request, post_id):
-    owner = get_object_or_404(Post, id=post_id).owner
-    post = Post.objects.get(id=post_id)
-    post.delete()
-    return HttpResponseRedirect(reverse('blog:user_profile', args=[owner]))
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('blog:user_login'))
+    else:
+        owner = get_object_or_404(Post, id=post_id).owner
+        post = Post.objects.get(id=post_id)
+        post.delete()
+        return HttpResponseRedirect(reverse('blog:user_profile', args=[owner]))
 
 
 def user_registration(request):
@@ -129,33 +142,44 @@ def user_registration(request):
     )
 
 
-def user_authentication(request):
+def user_login(request):
     if request.method == 'POST':
-        user_authentication_form = UserAuthenticationForm(request.POST)
-        if user_authentication_form.is_valid():
-            if User.objects.filter(
-                    username=user_authentication_form.cleaned_data['username']
-            ):
-                username = user_authentication_form.cleaned_data['username']
+        user_login_form = UserLoginForm(request.POST)
+        if user_login_form.is_valid():
+            username = user_login_form.cleaned_data['username']
+            password = user_login_form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
                 return HttpResponseRedirect(
                     reverse('blog:user_profile', args=[username])
                 )
+            else:
+                print(f'Login failed for user {user}')
     else:
-        user_authentication_form = UserAuthenticationForm()
+        user_login_form = UserLoginForm()
     return render(
         request,
-        'blog/user_authentication.html',
-        {'user_authentication_form': user_authentication_form}
+        'blog/user_login.html',
+        {'user_authentication_form': user_login_form}
     )
+
+
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('blog:index'))
 
 
 def user_profile(request, username):
-    user_posts = User.objects.get(username=username).post_set.all()
-    return render(
-        request,
-        'blog/user_profile.html',
-        {
-            'username': username,
-            'user_posts': user_posts
-        }
-    )
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('blog:user_login'))
+    else:
+        user_posts = User.objects.get(username=username).post_set.all()
+        return render(
+            request,
+            'blog/user_profile.html',
+            {
+                'username': username,
+                'user_posts': user_posts
+            }
+        )

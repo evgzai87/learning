@@ -11,6 +11,7 @@ urlpatterns = [
     path('posts/<int:post_id>', views.post_detail, name='post_detail'),
     path('category/<str:category>', views.posts_by_category, name='posts_by_category'),
     path('users/registration', views.user_registration, name='user_registration'),
-    path('users/authentication', views.user_authentication, name='user_authentication'),
+    path('users/login', views.user_login, name='user_login'),
+    path('users/logout', views.user_logout, name='user_logout'),
     path('users/profile/<str:username>', views.user_profile, name='user_profile')
 ]
