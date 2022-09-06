@@ -1,31 +1,19 @@
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from .models import Post, User
+
 from django.contrib.auth import \
     authenticate, \
     login, \
     logout
-
-from django.http import \
-    HttpResponseRedirect, \
-    Http404
-
-from .models import \
-    Post, \
-    User
-
 from django.shortcuts import \
     render, \
     reverse, \
-    get_object_or_404, \
-    get_list_or_404
-
-from .forms import \
-    PostAddForm, \
-    PostEditForm, \
-    UserRegistrationForm, \
-    LoginForm, \
-    UserLoginForm
+    get_object_or_404
+from .forms import PostAddForm, PostEditForm
 
 
 def index(request):
@@ -125,55 +113,55 @@ def post_remove(request, post_id):
 
 def user_registration(request):
     if request.method == 'POST':
-        user_registration_form = UserRegistrationForm(request.POST)
-        if user_registration_form.is_valid():
-            user_registration_form.save()
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
             return HttpResponseRedirect(reverse('blog:index'))
     else:
-        user_registration_form = UserRegistrationForm()
+        form = UserCreationForm()
     return render(
         request,
-        'blog/user_registration.html',
-        {'user_registration_form': user_registration_form}
+        'registration/registration.html',
+        {'form': form}
     )
 
 
-def user_login(request):
-    if request.method == 'POST':
-        user_login_form = UserLoginForm(request.POST)
-        if user_login_form.is_valid():
-            username = user_login_form.cleaned_data['username']
-            password = user_login_form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return HttpResponseRedirect(
-                    reverse('blog:user_profile', args=[username])
-                )
-            else:
-                print(f'Login failed for user {user}')
-    else:
-        user_login_form = UserLoginForm()
-    return render(
-        request,
-        'blog/user_login.html',
-        {'user_authentication_form': user_login_form}
-    )
+# def user_login(request):
+#     if request.method == 'POST':
+#         user_login_form = UserLoginForm(request.POST)
+#         if user_login_form.is_valid():
+#             username = user_login_form.cleaned_data['username']
+#             password = user_login_form.cleaned_data['password']
+#             user = authenticate(request, username=username, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 return HttpResponseRedirect(
+#                     reverse('blog:user_profile', args=[username])
+#                 )
+#             else:
+#                 print(f'Login failed for user {user}')
+#     else:
+#         user_login_form = UserLoginForm()
+#     return render(
+#         request,
+#         'blog/user_login.html',
+#         {'user_authentication_form': user_login_form}
+#     )
 
 
-def user_logout(request):
-    logout(request)
-    return HttpResponseRedirect(reverse('blog:index'))
+# def user_logout(request):
+#     logout(request)
+#     return HttpResponseRedirect(reverse('blog:index'))
 
 
-@login_required(login_url='/users/login')
-def user_profile(request, username):
-    user_posts = User.objects.get(username=username).post_set.all()
-    return render(
-        request,
-        'blog/user_profile.html',
-        {
-            'username': username,
-            'user_posts': user_posts
-        }
-    )
+# @login_required(login_url='/users/login')
+# def user_profile(request, username):
+#     user_posts = User.objects.get(username=username).post_set.all()
+#     return render(
+#         request,
+#         'blog/user_profile.html',
+#         {
+#             'username': username,
+#             'user_posts': user_posts
+#         }
+#     )
