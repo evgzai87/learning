@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm
 from django.forms import ModelForm, Form
 from django.forms import Form
 from .models import Post, User
@@ -24,6 +25,16 @@ class UserRegistrationForm(ModelForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'email']
 
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update(
+            {'class': 'form-control'}
+        )
+        self.fields['password'].widget.attrs.update(
+            {'class': 'form-control'}
+        )
 
 class UserLoginForm(Form):
     username = forms.CharField(
