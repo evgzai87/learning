@@ -63,10 +63,8 @@ def post_detail(request, post_id):
     )
 
 
-# @login_required()
+@login_required(login_url='/users/login')
 def post_add(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('blog:user_login'))
     if request.method == 'POST':
         post_add_form = PostAddForm(request.POST, request.FILES)
         if post_add_form.is_valid():
@@ -82,49 +80,45 @@ def post_add(request):
     )
 
 
+@login_required(login_url='/users/login')
 def post_edit(request, post_id):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('blog:user_login'))
-    else:
-        editing_post = Post.objects.filter(pk=post_id)
-        user = editing_post[0].owner
-        if request.method == 'POST':
-            post_edit_form = PostEditForm(
-                request.POST,
-                request.FILES,
-                instance=editing_post[0]
-            )
-
-            if post_edit_form.is_valid():
-                new_title = post_edit_form.cleaned_data['title']
-                new_content = post_edit_form.cleaned_data['content']
-                new_category = post_edit_form.cleaned_data['category']
-                editing_post.update(title=new_title)
-                editing_post.update(content=new_content)
-                editing_post.update(category=new_category)
-
-                return HttpResponseRedirect(reverse('blog:user_profile', args=[user]))
-        else:
-            post_edit_form = PostEditForm(instance=editing_post[0])
-
-        return render(
-            request,
-            'blog/post_edit.html',
-            {
-                'post_edit_form': post_edit_form,
-                'post_id': post_id
-            }
+    editing_post = Post.objects.filter(pk=post_id)
+    user = editing_post[0].owner
+    if request.method == 'POST':
+        post_edit_form = PostEditForm(
+            request.POST,
+            request.FILES,
+            instance=editing_post[0]
         )
 
+        if post_edit_form.is_valid():
+            new_title = post_edit_form.cleaned_data['title']
+            new_content = post_edit_form.cleaned_data['content']
+            new_category = post_edit_form.cleaned_data['category']
+            editing_post.update(title=new_title)
+            editing_post.update(content=new_content)
+            editing_post.update(category=new_category)
 
-def post_remove(request, post_id):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('blog:user_login'))
+            return HttpResponseRedirect(reverse('blog:user_profile', args=[user]))
     else:
-        owner = get_object_or_404(Post, id=post_id).owner
-        post = Post.objects.get(id=post_id)
-        post.delete()
-        return HttpResponseRedirect(reverse('blog:user_profile', args=[owner]))
+        post_edit_form = PostEditForm(instance=editing_post[0])
+
+    return render(
+        request,
+        'blog/post_edit.html',
+        {
+            'post_edit_form': post_edit_form,
+            'post_id': post_id
+        }
+    )
+
+
+@login_required(login_url='/users/login')
+def post_remove(request, post_id):
+    owner = get_object_or_404(Post, id=post_id).owner
+    post = Post.objects.get(id=post_id)
+    post.delete()
+    return HttpResponseRedirect(reverse('blog:user_profile', args=[owner]))
 
 
 def user_registration(request):
@@ -170,16 +164,14 @@ def user_logout(request):
     return HttpResponseRedirect(reverse('blog:index'))
 
 
+@login_required(login_url='/users/login')
 def user_profile(request, username):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('blog:user_login'))
-    else:
-        user_posts = User.objects.get(username=username).post_set.all()
-        return render(
-            request,
-            'blog/user_profile.html',
-            {
-                'username': username,
-                'user_posts': user_posts
-            }
-        )
+    user_posts = User.objects.get(username=username).post_set.all()
+    return render(
+        request,
+        'blog/user_profile.html',
+        {
+            'username': username,
+            'user_posts': user_posts
+        }
+    )
