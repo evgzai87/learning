@@ -6,7 +6,6 @@ from . import views
 app_name = 'blog'
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/registration', views.user_registration, name='registration'),
 
     path('', views.index, name='index'),
     path('posts/add', views.post_add, name='post_add'),
@@ -16,9 +15,9 @@ urlpatterns = [
 
     path('category/<str:category>', views.posts_by_category, name='posts_by_category'),
 
-    # path('users/registration', views.user_registration, name='user_registration'),
+    path('accounts/registration', views.user_registration, name='registration'),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
     path('accounts/profile/', views.profile, name='profile'),
-    # path('users/logout', views.user_logout, name='user_logout'),
-    # path('users/profile/<str:username>', views.user_profile, name='user_profile')
+    path('accounts/password_change/', auth_views.LoginView.as_view(), name='password_change'),
+    # path('accounts/password_reset/', auth_views.LoginView.as_view(), name='password_change'),
 ]

@@ -4,5 +4,5 @@
 
 <h1>User profile</h1>
 <p>Hello, {{ user.username }}!</p>
-<a href="#">Change a password</a>
+<a href="{% url 'blog:password_change' %}">Change a password</a>
 {% endblock content %}
