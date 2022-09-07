@@ -60,7 +60,7 @@ def post_add(request):
         if post_add_form.is_valid():
             user = post_add_form.cleaned_data['owner']
             post_add_form.save()
-            return HttpResponseRedirect(reverse('blog:user_profile', args=[user]))
+            return HttpResponseRedirect(reverse('blog:profile', args=[user]))
     else:
         post_add_form = PostAddForm()
     return render(

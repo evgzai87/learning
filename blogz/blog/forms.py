@@ -6,6 +6,7 @@ from .models import Post
 
 
 class PostAddForm(ModelForm):
+    # Add bootstrap classes for the form fields
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['title'].widget.attrs.update(
