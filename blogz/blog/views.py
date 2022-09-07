@@ -116,7 +116,7 @@ def user_registration(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('blog:index'))
+            return HttpResponseRedirect(reverse('blog:login'))
     else:
         form = UserCreationForm()
     return render(
@@ -133,44 +133,3 @@ def profile(request):
     #     'user_posts': user_posts
     # }
     return render(request, 'registration/profile.html', {})
-
-
-# def user_login(request):
-#     if request.method == 'POST':
-#         user_login_form = UserLoginForm(request.POST)
-#         if user_login_form.is_valid():
-#             username = user_login_form.cleaned_data['username']
-#             password = user_login_form.cleaned_data['password']
-#             user = authenticate(request, username=username, password=password)
-#             if user is not None:
-#                 login(request, user)
-#                 return HttpResponseRedirect(
-#                     reverse('blog:user_profile', args=[username])
-#                 )
-#             else:
-#                 print(f'Login failed for user {user}')
-#     else:
-#         user_login_form = UserLoginForm()
-#     return render(
-#         request,
-#         'blog/user_login.html',
-#         {'user_authentication_form': user_login_form}
-#     )
-
-
-# def user_logout(request):
-#     logout(request)
-#     return HttpResponseRedirect(reverse('blog:index'))
-
-
-# @login_required(login_url='/users/login')
-# def user_profile(request, username):
-#     user_posts = User.objects.get(username=username).post_set.all()
-#     return render(
-#         request,
-#         'blog/user_profile.html',
-#         {
-#             'username': username,
-#             'user_posts': user_posts
-#         }
-#     )
