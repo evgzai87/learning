@@ -22,14 +22,15 @@
         <form action="{% url 'blog:login' %}" method="post">
             {% csrf_token %}
             {% for field in form %}
-                {{ field.label_tag }}
-                {{ field }}
+                {{ field.label_tag }} <br>
+                {{ field }} <br>
             {% endfor %}
 
-            <p><input type="submit" value="Login"></p>
-            <p><input type="hidden" name="next" value="{{ next }}"></p>
+            <input type="submit" value="Login"> <br>
+            <input type="hidden" name="next" value="{{ next }}">
             
         </form>
+        <p><a href="{% url 'blog:registration' %}">Регистрация</a></p>
         <p><a href="#">Lost password?</a></p>
     </div>
 </div>
