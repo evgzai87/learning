@@ -53,7 +53,7 @@ def post_detail(request, post_id):
     )
 
 
-@login_required(login_url='/users/login')
+@login_required()
 def post_add(request):
     if request.method == 'POST':
         post_add_form = PostAddForm(request.POST, request.FILES)
@@ -70,7 +70,7 @@ def post_add(request):
     )
 
 
-@login_required(login_url='/users/login')
+@login_required
 def post_edit(request, post_id):
     editing_post = Post.objects.filter(pk=post_id)
     user = editing_post[0].owner
@@ -103,7 +103,7 @@ def post_edit(request, post_id):
     )
 
 
-@login_required(login_url='/users/login')
+@login_required
 def post_remove(request, post_id):
     owner = get_object_or_404(Post, id=post_id).owner
     post = Post.objects.get(id=post_id)
