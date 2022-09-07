@@ -17,8 +17,8 @@ urlpatterns = [
     path('category/<str:category>', views.posts_by_category, name='posts_by_category'),
 
     # path('users/registration', views.user_registration, name='user_registration'),
-    # path('accounts/login/', auth_views.LoginView.as_view(), name='user_login'),
-    # path('users/login', views.user_login, name='user_login'),
+    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    path('accounts/profile/', views.profile, name='profile'),
     # path('users/logout', views.user_logout, name='user_logout'),
     # path('users/profile/<str:username>', views.user_profile, name='user_profile')
 ]

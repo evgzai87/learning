@@ -125,6 +125,14 @@ def user_registration(request):
         {'form': form}
     )
 
+@login_required
+def profile(request):
+    user = request.user
+    context = {
+        'user': user
+    }
+    return render(request, 'registration/profile.html', context)
+
 
 # def user_login(request):
 #     if request.method == 'POST':
