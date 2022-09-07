@@ -2,7 +2,11 @@
 
 {% block content %}
 
-<h1>User profile</h1>
-<p>Hello, {{ user.username }}!</p>
-<a href="{% url 'blog:password_change' %}">Change a password</a>
+<h1>Профиль пользователя {{ user.username }}</h1>
+<p>Доступные функции:</p>
+<ul>
+    <li>Сменить пароль</li>
+    <li>Добавить пост</li>
+    <li>Посмотреть список опубликованных постов</li>
+</ul>
 {% endblock content %}
