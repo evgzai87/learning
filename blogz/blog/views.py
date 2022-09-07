@@ -1,9 +1,9 @@
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from .models import Post, User
+from .models import Post
 
 from django.contrib.auth import \
     authenticate, \
@@ -127,11 +127,12 @@ def user_registration(request):
 
 @login_required
 def profile(request):
-    user = request.user
-    context = {
-        'user': user
-    }
-    return render(request, 'registration/profile.html', context)
+    # user = User.objects.get(username=request.user.username)
+    # user_posts = Post.objects.filter(owner=user)
+    # context = {
+    #     'user_posts': user_posts
+    # }
+    return render(request, 'registration/profile.html', {})
 
 
 # def user_login(request):
