@@ -28,24 +28,32 @@ class IndexView(ListView):
 # by category.
 # Something similar to this:
 #
-# # class PostsByCategoryView(ListView):
-# #     model = Post
-# #     template_name = 'blog/posts_by_category.html'
-# #
-# #     def get_queryset(self):
-# #         qs = super().get_queryset()
-# #         return qs.filter(category=category_id)
-def posts_by_category(request, category):
-    posts_list = Post.objects.filter(category=category)
-    context = {
-        'posts_list': posts_list,
-        'category_name': category
-    }
-    return render(
-        request,
-        'blog/index.html',
-        context
-    )
+class PostsByCategoryView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # When we clicked on the category link, i.e. "Культура"
+        # we're redirected to the URL http(s)://example.com/category/7
+        # Thus, to get a category_id only what we need is to
+        # split the url string from the 'path_info' and grub
+        # the last element of the received list.
+        category_id = str(self.request.path_info).split('/')[-1]
+        return qs.filter(category=category_id)
+
+# def posts_by_category(request, category_pk):
+#     posts_list = Post.objects.filter(category=category_pk)
+#     print(f'-------: {posts_list}')
+#     context = {
+#         'posts_list': posts_list,
+#
+#     }
+#     return render(
+#         request,
+#         'blog/posts_by_category.html',
+#         context
+#     )
 
 
 class PostDetailView(DetailView):
