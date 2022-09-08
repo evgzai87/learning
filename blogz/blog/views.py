@@ -1,33 +1,40 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.views.generic import (
+    DetailView,
+    ListView
+)
+from django.views.generic.edit import (
+    CreateView,
+    UpdateView,
+    DeleteView
+)
+from django.utils import timezone
 from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.shortcuts import render, reverse
 from .models import Post
-
-from django.contrib.auth import \
-    authenticate, \
-    login, \
-    logout
-from django.shortcuts import \
-    render, \
-    reverse, \
-    get_object_or_404
 from .forms import PostAddForm, PostEditForm
 
 
-def index(request):
-    now = timezone.now()
-    posts_list = Post.objects.filter(publication_date__lte=now)
-    context = {
-        'posts_list': posts_list
-    }
-    return render(
-        request,
-        'blog/index.html',
-        context)
+class IndexView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
 
 
+# This view should be based on the ListView class.
+# The queryset has to accept posts that are filtered out
+# by category.
+# Something similar to this:
+#
+# # class PostsByCategoryView(ListView):
+# #     model = Post
+# #     template_name = 'blog/posts_by_category.html'
+# #
+# #     def get_queryset(self):
+# #         qs = super().get_queryset()
+# #         return qs.filter(category=category_id)
 def posts_by_category(request, category):
     posts_list = Post.objects.filter(category=category)
     context = {
@@ -41,74 +48,23 @@ def posts_by_category(request, category):
     )
 
 
-def post_detail(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    context = {
-        'post': post
-    }
-    return render(
-        request,
-        'blog/post_detail.html',
-        context
-    )
+class PostDetailView(DetailView):
+    model = Post
 
 
-@login_required()
-def post_add(request):
-    if request.method == 'POST':
-        post_add_form = PostAddForm(request.POST, request.FILES)
-        if post_add_form.is_valid():
-            user = post_add_form.cleaned_data['owner']
-            post_add_form.save()
-            return HttpResponseRedirect(reverse('blog:profile', args=[user]))
-    else:
-        post_add_form = PostAddForm()
-    return render(
-        request,
-        'blog/post_add.html',
-        {'post_add_form': post_add_form}
-    )
+class PostCreateView(CreateView):
+    model = Post
+    fields = ['title', 'content', 'image', 'category', 'owner']
 
 
-@login_required
-def post_edit(request, post_id):
-    editing_post = Post.objects.filter(pk=post_id)
-    user = editing_post[0].owner
-    if request.method == 'POST':
-        post_edit_form = PostEditForm(
-            request.POST,
-            request.FILES,
-            instance=editing_post[0]
-        )
-
-        if post_edit_form.is_valid():
-            new_title = post_edit_form.cleaned_data['title']
-            new_content = post_edit_form.cleaned_data['content']
-            new_category = post_edit_form.cleaned_data['category']
-            editing_post.update(title=new_title)
-            editing_post.update(content=new_content)
-            editing_post.update(category=new_category)
-
-            return HttpResponseRedirect(reverse('blog:user_profile', args=[user]))
-    else:
-        post_edit_form = PostEditForm(instance=editing_post[0])
-
-    return render(
-        request,
-        'blog/post_edit.html',
-        {
-            'post_edit_form': post_edit_form,
-            'post_id': post_id
-        }
-    )
+class PostUpdateView(UpdateView):
+    model = Post
+    fields = ['title', 'content', 'image', 'category', 'owner']
 
 
-@login_required
-def post_remove(request, post_id):
-    owner = get_object_or_404(Post, id=post_id).owner
-    post = Post.objects.get(id=post_id)
-    post.delete()
-    return HttpResponseRedirect(reverse('blog:user_profile', args=[owner]))
+class PostDeleteView(DeleteView):
+    model = Post
+    success_url = reverse_lazy('blog:profile')
 
 
 def user_registration(request):
@@ -125,6 +81,9 @@ def user_registration(request):
         {'form': form}
     )
 
+# This view should be a ListView based view.
+# Queryset has to accept posts filtered out by owner
+# where the owner is a current logged-in user.
 @login_required
 def profile(request):
     # user = User.objects.get(username=request.user.username)

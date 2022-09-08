@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.text import slugify
+from django.shortcuts import reverse
 
 
 class Post(models.Model):
@@ -55,6 +56,11 @@ class Post(models.Model):
     class Meta:
         ordering = ['-publication_date']
 
+    def get_absolute_url(self):
+        return reverse('blog:post_detail', kwargs={'pk': self.pk})
+
+    # We have to redefine save() function to auto-generate
+    # a slug for a new instance
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title, allow_unicode=True)

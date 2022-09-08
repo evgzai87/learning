@@ -12,14 +12,15 @@
 
 <div class="row g-5">
     <div class="col-md-8">
-        {% if posts_list %}
-        {% for post in posts_list %}
+        {% if object_list %}
+        {% for post in object_list %}
             <article class="blog-post">
                 <h2 class="blog-post-title mb-1">{{ post.title }}</h2>
             </article>
             <p class="blog-post-meta">
-                {{ post.publication_date }} by <a href="#">{{ post.owner }}</a>
-                {{ post.get_category_display }}
+                <b>Автор:</b> <a href="{% url 'blog:profile' %}">{{ post.owner }}</a>
+                <b>Дата публикации:</b> {{ post.publication_date | date }}
+                <b>Категория:</b> {{ post.get_category_display }}
             </p>
             <p>
                 {{ post.content | truncatewords:60 }}
