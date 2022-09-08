@@ -51,7 +51,7 @@ class Post(models.Model):
         max_length=2,
         choices=CATEGORY
     )
-    slug = models.SlugField(unique=True)
+    # slug = models.SlugField(unique=True)
 
     class Meta:
         ordering = ['-publication_date']
@@ -61,10 +61,10 @@ class Post(models.Model):
 
     # We have to redefine save() function to auto-generate
     # a slug for a new instance
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title, allow_unicode=True)
-        return super().save(self, *args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = slugify(self.title, allow_unicode=True)
+    #     return super().save(self, *args, **kwargs)
 
     def __str__(self):
         return self.title
