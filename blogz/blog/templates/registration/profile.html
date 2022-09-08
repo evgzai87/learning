@@ -3,16 +3,25 @@
 {% block content %}
 
 <h1>Профиль пользователя {{ user.username }}</h1>
-<p>Доступные функции:</p>
-<ul>
-    <li><a href="{% url 'blog:password_change' %}">Сменить пароль</a></li>
-    <li><a href="{% url 'blog:post_add' %}">Добавить пост</a></li>
-</ul>
 
-<h3>Ваши посты</h3>
-<ul>
-    {% for post in user_posts %}
-        <li><a href="#">{{ post.title }}</a></li>
-    {% endfor %}
-</ul>
+<div class="row">
+    <div class="col-md-4">
+        <ul>
+            <li><a href="{% url 'blog:password_change' %}">Сменить пароль</a></li>
+            <li><a href="{% url 'blog:post_add' %}">Добавить пост</a></li>
+        </ul>
+    </div>
+    <div class="col-md-8">
+        <ul>
+            {% for post in object_list %}
+                <li>
+                    {{ post.title | truncatewords:7 }}
+                    <a href="{% url 'blog:post_edit' post.id %}">Редактировать</a>
+                    <a href="{% url 'blog:post_remove' post.id %}">Удалить</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
 {% endblock content %}

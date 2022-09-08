@@ -12,7 +12,7 @@
                 <b>Категория:</b> {{ post.get_category_display }}
             </p>
             {% if post.image %}
-                <img src="{{ post.image.url }}" alt="">
+                <img src="{{ post.image.url }}" class="img-fluid" alt="">
             {% endif %}
             <p>{{ post.content }}</p>
         </article>

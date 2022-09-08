@@ -23,6 +23,9 @@
                 <b>Категория:</b> {{ post.get_category_display }}
             </p>
             <p>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid rounded fload-left" alt="">
+                {% endif %}
                 {{ post.content | truncatewords:60 }}
             </p>
             <a href="{% url 'blog:post_detail' post.id %}">Читать далее</a>
@@ -32,8 +35,17 @@
             <p>No posts are published yet.</p>
         {% endif %}
         <nav class="blog-pagination" aria-label="Pagination">
-            <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
-            <a class="btn btn-outline-secondary rounded-pill disabled">Newer</a>
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-primary rounded-pill" href="?page=1">Первая</a>
+                <a class="btn btn-outline-primary rounded-pill" href="?page={{ page_obj.previous_page_number }}">Newer</a>
+            {% endif %}
+            <span>
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-primary rounded-pill" href="?page={{ page_obj.next_page_number }}">Older</a>
+                <a class="btn btn-outline-primary rounded-pill" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
+            {% endif %}
         </nav>
     </div>
     <!-- sidebar -->

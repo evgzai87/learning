@@ -6,7 +6,8 @@ from .views import (
     PostCreateView,
     PostUpdateView,
     PostDeleteView,
-    PostsByCategoryView
+    PostsByCategoryView,
+    ProfileView
 )
 from . import views
 
@@ -25,7 +26,7 @@ urlpatterns = [
 
     path('accounts/registration', views.user_registration, name='registration'),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
-    path('accounts/profile/', views.profile, name='profile'),
+    path('accounts/profile/', ProfileView.as_view(), name='profile'),
     path('accounts/password_change/', auth_views.LoginView.as_view(), name='password_change'),
     # path('accounts/password_reset/', auth_views.LoginView.as_view(), name='password_change'),
 ]

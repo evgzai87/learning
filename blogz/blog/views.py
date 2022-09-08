@@ -21,17 +21,15 @@ from .forms import PostAddForm, PostEditForm
 class IndexView(ListView):
     model = Post
     template_name = 'blog/index.html'
+    paginate_by = 3
 
 
-# This view should be based on the ListView class.
-# The queryset has to accept posts that are filtered out
-# by category.
-# Something similar to this:
-#
 class PostsByCategoryView(ListView):
     model = Post
     template_name = 'blog/index.html'
 
+    # Redefine parent function to filter out queryset
+    # by category_id attribute.
     def get_queryset(self):
         qs = super().get_queryset()
         # When we clicked on the category link, i.e. "Культура"
@@ -41,19 +39,6 @@ class PostsByCategoryView(ListView):
         # the last element of the received list.
         category_id = str(self.request.path_info).split('/')[-1]
         return qs.filter(category=category_id)
-
-# def posts_by_category(request, category_pk):
-#     posts_list = Post.objects.filter(category=category_pk)
-#     print(f'-------: {posts_list}')
-#     context = {
-#         'posts_list': posts_list,
-#
-#     }
-#     return render(
-#         request,
-#         'blog/posts_by_category.html',
-#         context
-#     )
 
 
 class PostDetailView(DetailView):
@@ -89,14 +74,12 @@ def user_registration(request):
         {'form': form}
     )
 
-# This view should be a ListView based view.
-# Queryset has to accept posts filtered out by owner
-# where the owner is a current logged-in user.
-@login_required
-def profile(request):
-    # user = User.objects.get(username=request.user.username)
-    # user_posts = Post.objects.filter(owner=user)
-    # context = {
-    #     'user_posts': user_posts
-    # }
-    return render(request, 'registration/profile.html', {})
+
+class ProfileView(ListView):
+    model = Post
+    template_name = 'registration/profile.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user_id = User.objects.get(username=self.request.user.username)
+        return qs.filter(owner=user_id)
