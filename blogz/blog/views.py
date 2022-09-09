@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+
 from django.views.generic import (
     DetailView,
     ListView
@@ -10,12 +12,9 @@ from django.views.generic.edit import (
     UpdateView,
     DeleteView
 )
-from django.utils import timezone
-from django.http import HttpResponseRedirect
-from django.urls import reverse_lazy
-from django.shortcuts import render, reverse
-from .models import Post
-from .forms import PostAddForm, PostEditForm
+from django.urls import reverse_lazy, reverse
+from .models import Post, Comment
+from .forms import CommentForm
 
 
 class IndexView(ListView):
@@ -41,8 +40,22 @@ class PostsByCategoryView(ListView):
         return qs.filter(category=category_id)
 
 
-class PostDetailView(DetailView):
-    model = Post
+def post_detail_view(request, pk):
+    context = {}
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('blog:post_detail', kwargs={'pk': pk}))
+    else:
+        post = Post.objects.get(pk=pk)
+        comment_list = Comment.objects.filter(post=post.pk)
+        # add user to the owner field
+        form = CommentForm()
+        context.update(
+            {'post': post, 'form': form, 'comment_list': comment_list}
+        )
+        return render(request, 'blog/post_detail.html', context)
 
 
 class PostCreateView(CreateView):

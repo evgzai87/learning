@@ -5,7 +5,7 @@
     <div class="col-md-8">
 
         <article class="blog-post">
-            <h2 class="blog-post-title mb-1">{{ object.title }}</h2>
+            <h2 class="blog-post-title mb-1">{{ post.title }}</h2>
             <p class="blog-post-meta">
                 <b>Автор:</b> <a href="{% url 'blog:profile' %}">{{ post.owner }}</a>
                 <b>Дата публикации:</b> {{ post.publication_date | date }}
@@ -16,6 +16,22 @@
             {% endif %}
             <p>{{ post.content }}</p>
         </article>
+
+        {% include 'blog/comment.html' %}
+
+        <hr>
+        <h3>Комментарии</h3>
+        {% if comment_list %}
+            <ul>
+                {% for comment in comment_list %}
+                    <li>
+                        {{ comment.content }} <br>
+                        Дата: {{ comment.publication_date | date }}
+                        Автор: {{ comment.owner }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
 
     </div>
 </div>

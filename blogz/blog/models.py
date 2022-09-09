@@ -68,3 +68,13 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    content = models.TextField('Комментарий')
+    publication_date = models.DateTimeField('Дата публикации', default=timezone.now)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Комментарий пользователя {self.owner} на пост {self.post}."

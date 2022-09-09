@@ -2,7 +2,6 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from .views import (
     IndexView,
-    PostDetailView,
     PostCreateView,
     PostUpdateView,
     PostDeleteView,
@@ -20,7 +19,7 @@ urlpatterns = [
     path('posts/add', PostCreateView.as_view(), name='post_add'),
     path('posts/edit/<int:pk>', PostUpdateView.as_view(), name='post_edit'),
     path('posts/remove/<int:pk>', PostDeleteView.as_view(), name='post_remove'),
-    path('posts/<int:pk>', PostDetailView.as_view(), name='post_detail'),
+    path('posts/<int:pk>', views.post_detail_view, name='post_detail'),
 
     path('category/<int:category_id>', PostsByCategoryView.as_view(), name='posts_by_category'),
 

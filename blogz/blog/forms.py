@@ -2,8 +2,20 @@ from django.contrib.auth.models import User
 from django import forms
 from django.forms import ModelForm, Form
 from django.forms import Form
-from .models import Post
+from .models import Post, Comment
 
+
+class CommentForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update(
+                {'class': 'form-control'}
+            )
+
+    class Meta:
+        model = Comment
+        fields = ['content', 'owner', 'post']
 
 class PostAddForm(ModelForm):
     # Add bootstrap classes for the form fields
