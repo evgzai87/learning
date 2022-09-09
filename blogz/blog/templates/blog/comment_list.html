@@ -1,0 +1,17 @@
+<h4>Комментарии</h4>
+
+{% if comment_list %}
+<div class="card">
+{% for comment in comment_list %}
+
+  <div class="card-body p-4">
+    <h6>{{ comment.owner }}</h6>
+    <p class="mb-3">{{ comment.publication_date | date }}</p>
+    <p class="mb-0">{{ comment.content }}</p>
+  </div>
+
+<hr class="my-0">
+
+{% endfor %}
+</div>
+{% endif %}
