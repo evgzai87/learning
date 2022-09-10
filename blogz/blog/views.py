@@ -87,12 +87,13 @@ def user_registration(request):
         {'form': form}
     )
 
-
-class ProfileView(ListView):
-    model = Post
-    template_name = 'registration/profile.html'
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        user_id = User.objects.get(username=self.request.user.username)
-        return qs.filter(owner=user_id)
+# Not ready yet!
+#
+# class ProfileView(ListView):
+#     model = Post
+#     template_name = 'registration/profile.html'
+#
+#     def get_queryset(self):
+#         qs = super().get_queryset()
+#         user_id = User.objects.get(username=self.request.user.username)
+#         return qs.filter(owner=user_id)

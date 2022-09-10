@@ -51,7 +51,8 @@ class PostDetailViewTests(TestCase):
 
     def test_basic(self):
         """
-        Post is displayed.
+        . response.status_code is 200
+        . blog/post_detail.html template is used to render page
         """
         post = Post.objects.get(title="New post")
         url = reverse('blog:post_detail', args=[post.pk])
@@ -75,3 +76,69 @@ class PostCreateViewTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'blog/post_form.html')
+
+
+class PostUpdateViewTests(TestCase):
+    def setUp(self):
+        user = User.objects.create(username='john_doe')
+        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
+
+    def test_basic(self):
+        """
+        . response.status_code is 200
+        . blog/post_form.html template is used to render page
+        """
+        post = Post.objects.get(title='New post')
+        url = reverse('blog:post_edit', args=[post.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/post_form.html')
+
+
+class PostDeleteViewTests(TestCase):
+    def setUp(self):
+        user = User.objects.create(username='john_doe')
+        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
+
+    def test_basic(self):
+        """
+        . response.status_code is 200
+        . blog/post_form.html template is used to render page
+        """
+        post = Post.objects.get(title='New post')
+        url = reverse('blog:post_remove', args=[post.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        # self.assertTemplateUsed(response, 'blog/post_form.html')
+
+
+class UserRegistrationViewTests(TestCase):
+    def setUp(self):
+        User.objects.create(username='john_doe')
+
+    def test_basic(self):
+        """
+        . response.status_code is 200
+        . registration/registration.html template is used to render page
+        """
+        url = reverse('blog:registration')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'registration/registration.html')
+
+
+class ProfileViewTests(TestCase):
+    def setUp(self):
+        User.objects.create(username='john_doe')
+
+    def test_basic(self):
+        """
+        . response.status_code is 200
+        . registration/profile.html template is used to render page
+        """
+        url = reverse('blog:profile')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'registration/profile.html')
+
+
