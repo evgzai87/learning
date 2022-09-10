@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -87,13 +88,12 @@ def user_registration(request):
         {'form': form}
     )
 
-# Not ready yet!
-#
-# class ProfileView(ListView):
-#     model = Post
-#     template_name = 'registration/profile.html'
-#
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-#         user_id = User.objects.get(username=self.request.user.username)
-#         return qs.filter(owner=user_id)
+
+class ProfileView(ListView):
+    model = Post
+    template_name = 'registration/profile.html'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user_id = User.objects.get(username=self.request.user.username)
+        return qs.filter(owner=user_id)

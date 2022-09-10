@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
@@ -9,136 +10,158 @@ from ..forms import CommentForm
 import datetime
 
 
-class IndexViewTest(TestCase):
+class BaseTest(TestCase):
     def setUp(self):
-        user = User.objects.create(username='john_doe')
-        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
+        self.user = User.objects.create_user(username='john_doe', email='john_doe@example.com', password='paS$w0rd')
+        self.post = Post.objects.create(title="New post", content="Post content", category=1, owner_id=self.user.id)
+        self.post_from_another_category = Post.objects.create(
+            title="Post from category 1", content="Post content", category=2, owner_id=self.user.id)
 
-    def test_post(self):
+        self.post_list = Post.objects.all()
+
+        self.index_url = reverse('blog:index')
+        self.posts_by_category_url = reverse('blog:posts_by_category', args=[self.post.category])
+        self.post_detail_url = reverse('blog:post_detail', args=[self.post.pk])
+        self.post_add_url = reverse('blog:post_add')
+        self.post_edit_url = reverse('blog:post_edit', args=[self.post.id])
+        self.post_remove_url = reverse('blog:post_remove', args=[self.post.id])
+        self.registration_url = reverse('blog:registration')
+        self.profile_url = reverse('blog:profile')
+
+        return super().setUp()
+
+
+class IndexViewTest(BaseTest):
+    def test_can_view_page_correctly(self):
         """
-        Post is displayed.
+        . response.status_code is 200
+        . blog/index.html template is used to render page
         """
-        post_list = Post.objects.all()
-        url = reverse('blog:index')
-        response = self.client.get(url)
+        response = self.client.get(self.index_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'blog/index.html')
-        self.assertQuerysetEqual(response.context['object_list'], post_list)
 
 
-class PostsByCategoryViewTests(TestCase):
-    def setUp(self):
-        user = User.objects.create(username='john_doe')
-        Post.objects.create(title="Post from category 1", content="Post content", category=1, owner_id=user.id)
-        Post.objects.create(title="Post from category 2", content="Post content", category=2, owner_id=user.id)
+class PostsByCategoryViewTests(BaseTest):
+    def test_can_view_page_correctly(self):
+        """
+        . response.status_code is 200
+        . blog/index.html template is used to render page
+        """
+        response = self.client.get(self.posts_by_category_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/index.html')
 
     def test_two_posts_in_different_categories(self):
         """
         Only one post is displayed for a given category.
         """
-        post_from_category_1 = Post.objects.get(title="Post from category 1")
-        url = reverse('blog:posts_by_category', args=['1'])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'blog/index.html')
-        self.assertQuerysetEqual(response.context['object_list'], [post_from_category_1])
+        response = self.client.get(self.posts_by_category_url)
+        self.assertQuerysetEqual(response.context['object_list'], [self.post])
 
 
-class PostDetailViewTests(TestCase):
-    def setUp(self):
-        user = User.objects.create(username='john_doe')
-        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
-
-    def test_basic(self):
+class PostDetailViewTests(BaseTest):
+    def test_can_view_page_correctly(self):
         """
         . response.status_code is 200
         . blog/post_detail.html template is used to render page
         """
-        post = Post.objects.get(title="New post")
-        url = reverse('blog:post_detail', args=[post.pk])
-        response = self.client.get(url)
+        response = self.client.get(self.post_detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'blog/post_detail.html')
-        self.assertEqual(response.context['post'], post)
 
 
-class PostCreateViewTests(TestCase):
-    def setUp(self):
-        user = User.objects.create(username='john_doe')
-        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
-
-    def test_basic(self):
+class PostCreateViewTests(BaseTest):
+    def test_anonymous_user_access(self):
         """
-        . response.status_code is 200
-        . blog/post_form.html template is used to render page
+        Not authorized user can't view this page.
+        anonymous user is redirected to login page.
         """
-        url = reverse('blog:post_add')
-        response = self.client.get(url)
+        response = self.client.get(self.post_add_url)
+        self.assertRedirects(response, reverse('blog:login') + '?next=' + self.post_add_url)
+
+    def test_authorized_user_access(self):
+        """
+        Authorized user can view this page
+        """
+        self.client.login(username=self.user.username, password='paS$w0rd')
+        response = self.client.get(self.post_add_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'blog/post_form.html')
 
 
-class PostUpdateViewTests(TestCase):
-    def setUp(self):
-        user = User.objects.create(username='john_doe')
-        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
+class PostUpdateViewTests(BaseTest):
+    def test_anonymous_user_access(self):
+        """
+        Not authorized user can't view this page.
+        anonymous user is redirected to login page.
+        """
+        response = self.client.get(self.post_edit_url)
+        self.assertRedirects(response, reverse('blog:login') + '?next=' + self.post_edit_url)
 
-    def test_basic(self):
+    def test_authorized_user_access(self):
         """
-        . response.status_code is 200
-        . blog/post_form.html template is used to render page
+        Authorized user can view this page
         """
-        post = Post.objects.get(title='New post')
-        url = reverse('blog:post_edit', args=[post.id])
-        response = self.client.get(url)
+        self.client.login(username=self.user.username, password='paS$w0rd')
+        response = self.client.get(self.post_edit_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'blog/post_form.html')
 
 
-class PostDeleteViewTests(TestCase):
-    def setUp(self):
-        user = User.objects.create(username='john_doe')
-        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
+class PostDeleteViewTests(BaseTest):
+    def test_anonymous_user_access(self):
+        """
+        Not authorized user can't view this page.
+        anonymous user is redirected to login page.
+        """
+        response = self.client.get(self.post_remove_url)
+        self.assertRedirects(response, reverse('blog:login') + '?next=' + self.post_remove_url)
 
-    def test_basic(self):
+    def test_authorized_user_access(self):
         """
-        . response.status_code is 200
-        . blog/post_form.html template is used to render page
+        Authorized user can view this page
         """
-        post = Post.objects.get(title='New post')
-        url = reverse('blog:post_remove', args=[post.id])
-        response = self.client.get(url)
+        self.client.login(username=self.user.username, password='paS$w0rd')
+        response = self.client.get(self.post_remove_url)
         self.assertEqual(response.status_code, 200)
-        # self.assertTemplateUsed(response, 'blog/post_form.html')
+        self.assertTemplateUsed(response, 'blog/post_confirm_delete.html')
+
+    def test_redirect_on_success_deletion(self):
+        """
+        If post was deleted successful user is redirected to /accounts/profile url.
+        """
+        self.client.login(username=self.user.username, password='paS$w0rd')
+        response = self.client.post(self.post_remove_url)
+        self.assertRedirects(response, reverse('blog:profile'))
+        # self.assertIn(response.POST['Location'], '/accounts/profile', response.url)
 
 
-class UserRegistrationViewTests(TestCase):
-    def setUp(self):
-        User.objects.create(username='john_doe')
-
-    def test_basic(self):
+class UserRegistrationViewTests(BaseTest):
+    def test_can_view_page_correctly(self):
         """
         . response.status_code is 200
         . registration/registration.html template is used to render page
         """
-        url = reverse('blog:registration')
-        response = self.client.get(url)
+        response = self.client.get(self.registration_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'registration/registration.html')
 
 
-class ProfileViewTests(TestCase):
-    def setUp(self):
-        User.objects.create(username='john_doe')
+class ProfileViewTests(BaseTest):
+    def test_anonymous_user_access(self):
+        """
+        Not authorized user can't view this page.
+        anonymous user is redirected to login page.
+        """
+        response = self.client.get(self.profile_url)
+        self.assertRedirects(response, reverse('blog:login') + '?next=' + self.profile_url)
 
-    def test_basic(self):
+    def test_authorized_user_access(self):
         """
-        . response.status_code is 200
-        . registration/profile.html template is used to render page
+        Authorized user can view this page
         """
-        url = reverse('blog:profile')
-        response = self.client.get(url)
+        self.client.login(username=self.user.username, password='paS$w0rd')
+        response = self.client.get(self.profile_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'registration/profile.html')
-
-
