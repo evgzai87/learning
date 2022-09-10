@@ -14,6 +14,7 @@ class CommentForm(ModelForm):
         model = Comment
         fields = ['content', 'owner', 'post']
 
+
 class PostAddForm(ModelForm):
     # Add bootstrap classes for the form fields
     def __init__(self, *args, **kwargs):
