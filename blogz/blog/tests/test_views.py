@@ -9,33 +9,21 @@ from ..forms import CommentForm
 import datetime
 
 
-def create_post(title, category=1, days_offset=0, author='john_doe'):
-    """
-    Creates a post with a given title and number of days offset to now.
-    """
-    content = "Test post content."
-    publication_date = timezone.now() + datetime.timedelta(days=days_offset)
-    email = author + '@example.com'
-    owner = User.objects.create(username=author, email=email)
-    return Post.objects.create(
-        title=title,
-        content=content,
-        publication_date=publication_date,
-        owner_id=owner.id,
-        category=category
-    )
+class IndexViewTest(TestCase):
+    def setUp(self):
+        user = User.objects.create(username='john_doe')
+        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
 
-
-def create_user(username='john_doe', first_name='John', last_name='Doe', email='john_doe@example.com'):
-    """
-    Creates a user with a given username.
-    """
-    return User.objects.create(
-        username=username,
-        first_name=first_name,
-        last_name=last_name,
-        email=email
-    )
+    def test_post(self):
+        """
+        Post is displayed.
+        """
+        post_list = Post.objects.all()
+        url = reverse('blog:index')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/index.html')
+        self.assertQuerysetEqual(response.context['object_list'], post_list)
 
 
 class PostsByCategoryViewTests(TestCase):
@@ -52,14 +40,16 @@ class PostsByCategoryViewTests(TestCase):
         url = reverse('blog:posts_by_category', args=['1'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/index.html')
         self.assertQuerysetEqual(response.context['object_list'], [post_from_category_1])
 
 
 class PostDetailViewTests(TestCase):
     def setUp(self):
-        create_post("New post")
+        user = User.objects.create(username='john_doe')
+        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
 
-    def test_post(self):
+    def test_basic(self):
         """
         Post is displayed.
         """
@@ -67,4 +57,21 @@ class PostDetailViewTests(TestCase):
         url = reverse('blog:post_detail', args=[post.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/post_detail.html')
         self.assertEqual(response.context['post'], post)
+
+
+class PostCreateViewTests(TestCase):
+    def setUp(self):
+        user = User.objects.create(username='john_doe')
+        Post.objects.create(title="New post", content="Post content", category=1, owner_id=user.id)
+
+    def test_basic(self):
+        """
+        . response.status_code is 200
+        . blog/post_form.html template is used to render page
+        """
+        url = reverse('blog:post_add')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/post_form.html')
