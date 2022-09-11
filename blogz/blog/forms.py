@@ -29,9 +29,14 @@ class PostAddForm(ModelForm):
             {'class': 'form-control'}
         )
 
+    def save(self, commit=True):
+        self.instance.owner = self.request.user
+        print(f"------------: {type(self.instance)}")
+        return super().save(commit=commit)
+
     class Meta:
         model = Post
-        fields = ['title', 'content', 'image', 'category', 'owner']
+        fields = ['title', 'content', 'image', 'category']
         help_texts = {
             'title': 'Укажите название статьи',
             'content': 'Напишите что-нибудь по теме'

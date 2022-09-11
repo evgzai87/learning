@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.views.generic.base import View
+from django.views.generic.detail import SingleObjectMixin
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from django.views.generic import (
     DetailView,
@@ -27,6 +29,7 @@ class IndexView(ListView):
 class PostsByCategoryView(ListView):
     model = Post
     template_name = 'blog/index.html'
+    paginate_by = 3
 
     # Redefine parent function to filter out queryset
     # by category_id attribute.
@@ -49,7 +52,7 @@ def post_detail_view(request, pk):
             form.save()
             return HttpResponseRedirect(reverse('blog:post_detail', kwargs={'pk': pk}))
     else:
-        post = Post.objects.get(pk=pk)
+        post = get_object_or_404(Post, pk=pk)
         comment_list = Comment.objects.filter(post=post.pk)
         # add user to the owner field
         form = CommentForm()
@@ -61,17 +64,22 @@ def post_detail_view(request, pk):
 
 class PostCreateView(CreateView):
     model = Post
-    fields = ['title', 'content', 'image', 'category', 'owner']
+    fields = ['title', 'content', 'image', 'category']
+    success_url = reverse_lazy('blog:profile')
+    template_name = 'blog/post_form.html'
 
 
 class PostUpdateView(UpdateView):
     model = Post
     fields = ['title', 'content', 'image', 'category', 'owner']
+    success_url = reverse_lazy('blog:profile')
+    template_name = 'blog/post_form.html'
 
 
 class PostDeleteView(DeleteView):
     model = Post
     success_url = reverse_lazy('blog:profile')
+    template_name = 'blog/post_confirm_delete.html'
 
 
 def user_registration(request):
