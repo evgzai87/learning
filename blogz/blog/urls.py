@@ -3,6 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from .views import (
     IndexView,
+    PostView,
     PostCreateView,
     PostUpdateView,
     PostDeleteView,
@@ -20,7 +21,7 @@ urlpatterns = [
     path('posts/add', login_required(PostCreateView.as_view()), name='post_add'),
     path('posts/edit/<int:pk>', login_required(PostUpdateView.as_view()), name='post_edit'),
     path('posts/remove/<int:pk>', login_required(PostDeleteView.as_view()), name='post_remove'),
-    path('posts/<int:pk>', views.post_detail_view, name='post_detail'),
+    path('posts/<int:pk>', PostView.as_view(), name='post_detail'),
 
     path('category/<int:category_id>', PostsByCategoryView.as_view(), name='posts_by_category'),
 

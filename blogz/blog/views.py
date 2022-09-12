@@ -1,9 +1,10 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
-from django.http import HttpResponseRedirect
+from django.views.generic.edit import BaseFormView
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 
 from django.views.generic import (
@@ -42,6 +43,40 @@ class PostsByCategoryView(ListView):
         # the last element of the received list.
         category_id = str(self.request.path_info).split('/')[-1]
         return qs.filter(category=category_id)
+
+
+class PostView(View):
+    def get(self, request, *args, **kwargs):
+        view = PostDetailView.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        view = CommentFormView.as_view()
+        return view(request, *args, **kwargs)
+
+
+class PostDetailView(SingleObjectMixin, TemplateResponseMixin, View):
+    model = Post
+    template_name = 'blog/post_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        context['form'] = CommentForm()
+        return self.render_to_response(context)
+
+
+class CommentFormView(SingleObjectMixin, BaseFormView, TemplateResponseMixin, View):
+    model = Post
+    form_class = CommentForm
+    template_name = 'blog/post_detail.html'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(self, request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('blog:post_detail', kwargs={'pk': self.object.pk})
 
 
 def post_detail_view(request, pk):
