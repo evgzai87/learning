@@ -1,8 +1,8 @@
 <h4>Комментарии</h4>
 
-{% if comment_list %}
+{% if post.comment_set %}
 <div class="card">
-{% for comment in comment_list %}
+{% for comment in post.comment_set.all %}
 
   <div class="card-body p-4">
     <h6>{{ comment.owner }}</h6>

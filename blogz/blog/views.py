@@ -3,7 +3,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import View, TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import BaseFormView
+from django.views.generic.list import MultipleObjectMixin
+from django.views.generic.edit import ModelFormMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 
@@ -63,20 +64,23 @@ class PostDetailView(SingleObjectMixin, TemplateResponseMixin, View):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         context['form'] = CommentForm()
+        # We have to receive a list of comments
+        # We can't use MultipleObjectMixin
         return self.render_to_response(context)
 
 
-class CommentFormView(SingleObjectMixin, BaseFormView, TemplateResponseMixin, View):
-    model = Post
+class CommentFormView(ModelFormMixin, View):
     form_class = CommentForm
-    template_name = 'blog/post_detail.html'
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().post(self, request, *args, **kwargs)
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     def get_success_url(self):
-        return reverse('blog:post_detail', kwargs={'pk': self.object.pk})
+        return reverse('blog:post_detail', kwargs={'pk': self.object.post_id})
 
 
 def post_detail_view(request, pk):
